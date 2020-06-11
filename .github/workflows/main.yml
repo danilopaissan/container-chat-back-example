@@ -38,7 +38,7 @@ jobs:
          registries: 185993034714
       - name: Docker login
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: 185993034714.dkr.ecr.eu-central-1.amazonaws.com/danilo-paissan-test
           ECR_REPOSITORY: danilo-paissan-test
           IMAGE_TAG: ${{ github.sha }}
         run:
