@@ -36,14 +36,16 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         with:
          registries: 185993034714
-      - name: Docker login
-        env:
-          ECR_REGISTRY: 185993034714.dkr.ecr.eu-central-1.amazonaws.com/danilo-paissan-test
-          ECR_REPOSITORY: danilo-paissan-test
-          IMAGE_TAG: ${{ github.sha }}
-        run:
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Docker build
+        run: docker build -t back .
+      - name: Docker tag
+        run: |
+          docker tag back back:${{ github.sha }}
+          docker tag back back:latest
+      - name: Docker push
+        run: |
+          docker push back:${{ github.sha }}
+          docker push back:latest
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
