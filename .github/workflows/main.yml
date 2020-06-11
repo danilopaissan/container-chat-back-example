@@ -1,0 +1,49 @@
+name: Backend Chat CI/CD
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    container:
+      image: node
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install & Tests
+        run: |
+          npm install
+          npm test
+  cd:
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ECR_USER_KEY }}
+          aws-secret-access-key: ${{ secrets.ECR_USER_PWD }}
+          aws-region: eu-central-1
+      - name: Amazon ECR "Login" Action for GitHub Actions
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+         registries: 185993034714
+      - name: Docker login
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: danilo-paissan-test
+          IMAGE_TAG: ${{ github.sha }}
+        run:
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Logout of Amazon ECR
+        if: always()
+        run: docker logout ${{ steps.login-ecr.outputs.registry }}
