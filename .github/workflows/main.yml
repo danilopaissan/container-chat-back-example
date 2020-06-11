@@ -43,15 +43,15 @@ jobs:
           ECR_REGISTRY: 185993034714.dkr.ecr.eu-central-1.amazonaws.com
           ECR_REPOSITORY:  danilo-paissan-test 
         run: |
-          docker tag back $ECR_REGISTRY/$ECR_REPOSITORY/back:${{ github.sha }}
-          docker tag back $ECR_REGISTRY/$ECR_REPOSITORY/back:latest
+          docker tag back $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker tag back $ECR_REGISTRY/$ECR_REPOSITORY:latest
       - name: Docker push
         env:
           ECR_REGISTRY: 185993034714.dkr.ecr.eu-central-1.amazonaws.com
           ECR_REPOSITORY:  danilo-paissan-test 
         run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY/back:${{ github.sha }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY/back:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
